@@ -9,6 +9,7 @@ using Microsoft.Extensions.Logging;
 using PlatformService.Data;
 using PlatformService.Dtos;
 using PlatformService.Models;
+using PlatformService.SyncDataServicess.Http;
 
 namespace PlatformService.Controllers
 {
@@ -18,11 +19,16 @@ namespace PlatformService.Controllers
     {
         private readonly IPlatformRepo _platFormRepo;
         private readonly IMapper _mapper;
+        private readonly ICommandDataClient _commandDataClient;
 
-        public PlatformsController(IPlatformRepo platFormRepo, IMapper mapper)
+        public PlatformsController(
+            IPlatformRepo platFormRepo, 
+            IMapper mapper,
+            ICommandDataClient commandDataClient)
         {
             _platFormRepo = platFormRepo;
             _mapper = mapper;
+            _commandDataClient = commandDataClient;
         }
 
         public ActionResult<IEnumerable<PlatformReadDto>> GetPlatforms()
@@ -44,13 +50,22 @@ namespace PlatformService.Controllers
         }
 
         [HttpPost]
-        public ActionResult<PlatformReadDto> CreatePlatform(PlatformCreateDto platformCreateDto)
+        public async Task<ActionResult<PlatformReadDto>> CreatePlatform(PlatformCreateDto platformCreateDto)
         {
             var platformModel = _mapper.Map<Platform>(platformCreateDto);
             _platFormRepo.CreatePlatform(platformModel);
             _platFormRepo.SaveChanges();
             
             var PlatformReadDto = _mapper.Map<PlatformReadDto>(platformModel);
+
+            try{
+                await _commandDataClient.SendPlatformToCommand(PlatformReadDto);
+
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine($"Could not send synchronously: {ex.Message}");
+            }
 
             return CreatedAtRoute(nameof(GetPlatformById), new {Id = PlatformReadDto.Id}, PlatformReadDto);
 
