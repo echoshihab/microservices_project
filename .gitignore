@@ -363,3 +363,5 @@ MigrationBackup/
 FodyWeavers.xsd
 PlatformService/.vscode/launch.json
 PlatformService/.vscode/tasks.json
+
+*.Production.json
