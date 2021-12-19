@@ -365,3 +365,5 @@ PlatformService/.vscode/launch.json
 PlatformService/.vscode/tasks.json
 
 *.Production.json
+.vscode/launch.json
+.vscode/tasks.json

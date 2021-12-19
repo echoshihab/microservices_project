@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using CommandService.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace CommandService.Data
@@ -19,13 +20,13 @@ namespace CommandService.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder
-                .Entity<PlatformID>()
+                .Entity<Platform>()
                 .HasMany(p => p.Commands)
                 .WithOne(p => p.Platform!)
                 .HasForeignKey(p => p.PlatformId);
 
             modelBuilder
-                .Entity<Command>
+                .Entity<Command>()
                 .HasOne(p => p.Platform)
                 .WithMany(p => p.Commands)
                 .HasForeignKey(p => p.PlatformId);
