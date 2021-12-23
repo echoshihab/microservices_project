@@ -37,6 +37,27 @@ namespace CommandService.Controllers
             return Ok(_mapper.Map<IEnumerable<CommandReadDto>>(commands));
         }
 
+        [HttpGet("{commandId}", Name = "GetCommandForPlatform")]
+        public ActionResult<CommandReadDto> GetCommandForPlatform(int platformId, int commandId)
+        {
+            Console.WriteLine($"--> Hit GetCommandForPlatform: {platformId} /{commandId}");
+
+            if(!_commandRepo.PlatformExists(platformId))
+            {
+                return NotFound();
+            }
+
+            var command = _commandRepo.GetCommand(platformId, commandId);
+
+            if(command == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(_mapper.Map<CommandReadDto>(command));
+
+        }
+
         
     }
 }
