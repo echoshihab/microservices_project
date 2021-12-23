@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using CommandService.Data;
 using CommandService.Dtos;
+using CommandService.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
@@ -56,6 +57,27 @@ namespace CommandService.Controllers
 
             return Ok(_mapper.Map<CommandReadDto>(command));
 
+        }
+
+        [HttpPost]
+        public ActionResult<CommandReadDto> CreateCommandForPlatform(int platformId, CommandCreateDto commandDto)
+        {
+          Console.WriteLine($"--> Hit CreateCommandForPlatform: {platformId}");
+
+          if(!_commandRepo.PlatformExists(platformId))
+          {
+              return NotFound();
+          }   
+
+          var command = _mapper.Map<Command>(commandDto);
+
+          _commandRepo.CreateCommand(platformId, command);
+          _commandRepo.SaveChanges();
+
+          var commandReadDto = _mapper.Map<CommandReadDto>(command);
+
+          return CreatedAtRoute(nameof(GetCommandsForPlatform), 
+                new {platformId = platformId, commandId = commandReadDto }, commandReadDto);
         }
 
         
