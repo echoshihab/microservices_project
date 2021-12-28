@@ -34,7 +34,7 @@ spec:
     protocol: TCP
     port: 15672
     targetPort: 15672
-  - name: rbqm-msg-port
+  - name: rbmq-msg-port
     protocol: TCP
     port: 5672
     targetPort: 5672             
@@ -49,10 +49,10 @@ spec:
     app: rabbitmq
   ports: 
   - name: rbmq-mgmt-port
-  - protocol: TCP
+    protocol: TCP
     port: 15672
     targetPort: 15672
-  - name: rbqm-msg-port
+  - name: rbmq-msg-port
     protocol: TCP
     port: 5672
     targetPort: 5672
