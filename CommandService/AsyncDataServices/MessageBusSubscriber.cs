@@ -1,10 +1,12 @@
 using System;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using CommandService.EventProcessing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using RabbitMQ.Client;
+using RabbitMQ.Client.Events;
 
 namespace CommandService.AsyncDataServices
 {
@@ -26,7 +28,7 @@ namespace CommandService.AsyncDataServices
 
         private void InitializeRabbitMQ()
         {
-            var factory = new ConnectionFactory() { HostName = _configuration["RabbitMQHost"], Port = int.Parse(_configuration["RabbitMQPort"])};]
+            var factory = new ConnectionFactory() { HostName = _configuration["RabbitMQHost"], Port = int.Parse(_configuration["RabbitMQPort"])};
 
             _connection = factory.CreateConnection();
             _channel = _connection.CreateModel();
@@ -57,7 +59,21 @@ namespace CommandService.AsyncDataServices
 
         protected override Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            throw new NotImplementedException();
+            stoppingToken.ThrowIfCancellationRequested();
+            var consumer = new EventingBasicConsumer(_channel);
+
+            consumer.Received += (ModuleHandle, ea) => 
+            {
+                Console.WriteLine("--> Event Received!");
+                var body = ea.Body;
+                var notificationMessage = Encoding.UTF8.GetString(body.ToArray());
+
+                _eventProcessor.ProcessEvent(notificationMessage);
+            };
+
+            _channel.BasicConsume(queue: _queueName, autoAck: true, consumer: consumer);
+            return Task.CompletedTask;
         }
+
     }
 }
