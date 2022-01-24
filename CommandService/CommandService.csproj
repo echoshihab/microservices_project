@@ -22,4 +22,8 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="5.0.11" />
   </ItemGroup>
 
+    <ItemGroup>
+    <Protobuf Include="Protos\platforms.proto" GrpcServices="Client" />
+  </ItemGroup>
+
 </Project>
