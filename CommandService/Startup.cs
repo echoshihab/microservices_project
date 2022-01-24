@@ -65,6 +65,8 @@ namespace CommandService
             {
                 endpoints.MapControllers();
             });
+
+            PrepDb.PrepPopulation(app);
         }
     }
 }
